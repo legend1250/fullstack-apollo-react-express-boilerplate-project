@@ -3,7 +3,7 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     events(cursor: String, limit: Int): EventConnection!
-    event(id: ID!): Event!
+    event(id: ID!): Event
   }
 
   extend type Mutation {
