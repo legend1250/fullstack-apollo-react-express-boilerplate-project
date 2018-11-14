@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import { EditorState, convertToRaw  } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
-import '../../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import ErrorMessage from '../../Error';
 
-const CREATE_MESSAGE = gql`
+const CREATE_EVENT = gql`
   mutation($title: String!, $description: String!) {
-    createMessage(title: $title, description: $description) {
+    createEvent(title: $title, description: $description) {
       id
-      # title,
-      # description,
+      title,
+      description,
       createdAt
       user {
         id
@@ -22,7 +22,7 @@ const CREATE_MESSAGE = gql`
   }
 `;
 
-class MessageCreate extends Component {
+class EventCreate extends Component {
   state = {
     title: '',
     editorState: EditorState.createEmpty(),
@@ -39,11 +39,11 @@ class MessageCreate extends Component {
     this.setState({[name]: value});
   }
 
-  onSubmit = async (event, createMessage) => {
+  onSubmit = async (event, createEvent) => {
     event.preventDefault();
 
     try {
-      await createMessage();
+      await createEvent();
       this.setState({ editorState: EditorState.createEmpty() });
     } catch (error) {}
   };
@@ -54,33 +54,14 @@ class MessageCreate extends Component {
 
     return (
       <Mutation
-        mutation={CREATE_MESSAGE}
+        mutation={CREATE_EVENT}
         variables={dataSubmit}
-        // Not used anymore because of Subscription
-
-        // update={(cache, { data: { createMessage } }) => {
-        //   const data = cache.readQuery({
-        //     query: GET_ALL_MESSAGES_WITH_USERS,
-        //   });
-
-        //   cache.writeQuery({
-        //     query: GET_ALL_MESSAGES_WITH_USERS,
-        //     data: {
-        //       ...data,
-        //       messages: {
-        //         ...data.messages,
-        //         edges: [createMessage, ...data.messages.edges],
-        //         pageInfo: data.messages.pageInfo,
-        //       },
-        //     },
-        //   });
-        // }}
       >
-        {(createMessage, { data, loading, error }) => (
+        {(createEvent, { data, loading, error }) => (
           <form
-            onSubmit={event => this.onSubmit(event, createMessage)}
+            onSubmit={event => this.onSubmit(event, createEvent)}
           >
-            <h3>New message</h3>
+            <h3>New Event</h3>
             <div style={{marginBottom: 12, minHeight: 24}}  >
               <span><label>Title </label></span>
               <input 
@@ -107,4 +88,4 @@ class MessageCreate extends Component {
   }
 }
 
-export default MessageCreate;
+export default EventCreate

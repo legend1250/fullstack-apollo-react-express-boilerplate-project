@@ -1,15 +1,15 @@
 import React from 'react';
 import withSession from '../Session/withSession';
-import { MessageCreate, Messages } from '../Message';
+import { EventCreate, Events } from '../Event';
 
 const Landing = ({ session }) => (
   <div>
     <h2>Landing Page</h2>
 
-    {session && session.me && <MessageCreate />}
+    {session && session.me && <EventCreate />}
     <hr />
     <hr />
-    <Messages me={session.me} limit={2} />
+    <Events me={session.me} limit={2} />
   </div>
 );
 

@@ -2,14 +2,14 @@ import React, { Component, Fragment } from 'react';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import MessageItem from '../MessageItem'
-// import MessageDelete from '../MessageDelete';
+import EventItem from '../EventItem'
+// import EventDelete from '../EventDelete';
 import Loading from '../../Loading';
 
-const MESSAGE_CREATED = gql`
+const EVENT_CREATED = gql`
   subscription {
-    messageCreated {
-      message {
+    eventCreated {
+      event {
         id
         title
         description
@@ -23,10 +23,10 @@ const MESSAGE_CREATED = gql`
   }
 `;
 
-const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
+const GET_PAGINATED_EVENTS_WITH_USERS = gql`
   query($cursor: String, $limit: Int!) {
-    messages(cursor: $cursor, limit: $limit)
-      @connection(key: "MessagesConnection") {
+    events(cursor: $cursor, limit: $limit)
+      @connection(key: "EventConnection") {
       edges {
         id
         title
@@ -45,45 +45,45 @@ const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
   }
 `;
 
-const Messages = ({ limit, me }) => (
+const Events = ({ limit, me }) => (
   <Query
-    query={GET_PAGINATED_MESSAGES_WITH_USERS}
+    query={GET_PAGINATED_EVENTS_WITH_USERS}
     variables={{ limit }}
   >
     {({ data, loading, error, fetchMore, subscribeToMore }) => {
       if (!data) {
         return (
           <div>
-            There are no messages yet ... Try to create one by
+            There are no events yet ... Try to create one by
             yourself.
           </div>
         );
       }
 
-      const { messages } = data;
+      const { events } = data;
 
-      if (loading || !messages) {
+      if (loading || !events) {
         return <Loading />;
       }
 
-      const { edges, pageInfo } = messages;
+      const { edges, pageInfo } = events;
 
       return (
         <Fragment>
-          <MessageList
-            messages={edges}
+          <EventList
+            events={edges}
             me={me}
             subscribeToMore={subscribeToMore}
           />
 
           {pageInfo.hasNextPage && (
-            <MoreMessagesButton
+            <MoreEventsButton
               limit={limit}
               pageInfo={pageInfo}
               fetchMore={fetchMore}
             >
               More
-            </MoreMessagesButton>
+            </MoreEventsButton>
           )}
         </Fragment>
       );
@@ -91,7 +91,7 @@ const Messages = ({ limit, me }) => (
   </Query>
 );
 
-const MoreMessagesButton = ({
+const MoreEventsButton = ({
   limit,
   pageInfo,
   fetchMore,
@@ -111,11 +111,11 @@ const MoreMessagesButton = ({
           }
 
           return {
-            messages: {
-              ...fetchMoreResult.messages,
+            events: {
+              ...fetchMoreResult.events,
               edges: [
-                ...previousResult.messages.edges,
-                ...fetchMoreResult.messages.edges,
+                ...previousResult.events.edges,
+                ...fetchMoreResult.events.edges,
               ],
             },
           };
@@ -127,24 +127,24 @@ const MoreMessagesButton = ({
   </button>
 );
 
-class MessageList extends Component {
-  subscribeToMoreMessage = () => {
+class EventList extends Component {
+  subscribeToMoreEvent = () => {
     this.props.subscribeToMore({
-      document: MESSAGE_CREATED,
+      document: EVENT_CREATED,
       updateQuery: (previousResult, { subscriptionData }) => {
         if (!subscriptionData.data) {
           return previousResult;
         }
 
-        const { messageCreated } = subscriptionData.data;
+        const { eventCreated } = subscriptionData.data;
 
         return {
           ...previousResult,
-          messages: {
-            ...previousResult.messages,
+          events: {
+            ...previousResult.events,
             edges: [
-              messageCreated.message,
-              ...previousResult.messages.edges,
+              eventCreated.event,
+              ...previousResult.events.edges,
             ],
           },
         };
@@ -153,14 +153,14 @@ class MessageList extends Component {
   };
 
   componentDidMount() {
-    this.subscribeToMoreMessage();
+    this.subscribeToMoreEvent();
   }
 
   render() {
-    const { messages, me } = this.props;
+    const { events, me } = this.props;
 
-    return messages.map(message => (
-      <MessageItem key={message.id} message={message} me={me} />
+    return events.map(event => (
+      <EventItem key={event.id} event={event} me={me} />
     ));
   }
 }
@@ -178,4 +178,4 @@ class MessageList extends Component {
 //   </div>
 // );
 
-export default Messages;
+export default Events;

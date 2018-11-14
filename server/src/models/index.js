@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import User from './user'
-import Message from './message'
+import Event from './event'
 
 if(process.env.MONGODB_URI){
   mongoose.connect(process.env.MONGODB_URI,{ 
@@ -11,13 +11,18 @@ if(process.env.MONGODB_URI){
       reconnectInterval: 30000 
     }
   )
-  .then(() => console.log('connecting to database successful'))
-  .catch(err => console.error('could not connect to mongo DB', err));
+  .then(() =>{
+    console.log(`Connect to MongoDB successful! (${process.env.MONGODB_URI})`)
+  })  
+  .catch(err => console.error(`Could not connect to MongoDB at ${process.env.MONGODB_URI}`, err));
+}
+else{
+  throw new Error(`MONGODB_URI env doesn't exist`)
 }
 
 const models = {
   User,
-  Message
+  Event
 }
 
 export default models;

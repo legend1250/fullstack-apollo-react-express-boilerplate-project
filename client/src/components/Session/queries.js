@@ -18,7 +18,7 @@ export const GET_ALL_USERS = gql`
       username,
       email,
       role,
-      messages{
+      events{
         text,
         createdAt
       }

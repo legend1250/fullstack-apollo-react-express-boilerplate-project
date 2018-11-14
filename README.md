@@ -2,7 +2,7 @@
 
 [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/)
 
-A full-fledged Apollo Server 2 with Apollo Client 2 starter project with React, Express and PostgreSQL. 
+A full-fledged Apollo Server 2 with Apollo Client 2 starter project with React, Express and MongoDB. 
 
 [GraphQL Server Tutorial](https://www.robinwieruch.de/graphql-apollo-server-tutorial/)
 
@@ -12,8 +12,8 @@ A full-fledged Apollo Server 2 with Apollo Client 2 starter project with React, 
   * Queries, Mutations, Subscriptions
 * Node.js with Express and Apollo Server 2
   * cursor-based Pagination
-* PostgreSQL Database with Sequelize
-  * entities: users, messages
+* MongoDB Database with Mongoose
+  * entities: users, events
 * Authentication
   * powered by JWT and local storage
   * Sign Up, Sign In, Sign Out
@@ -48,7 +48,7 @@ A full-fledged Apollo Server 2 with Apollo Client 2 starter project with React, 
 
 #### .env file
 
-Since this boilerplate project is using PostgreSQL, you have to install it for your machine and get a database up and running. You find everything for the set up over here: [Setup PostgreSQL with Sequelize in Express Tutorial](https://www.robinwieruch.de/postgres-express-setup-tutorial). After you have created a database and a database user, you can fill out the environment variables in the *server/.env* file.
+Since this boilerplate project is using MongoDB, you have to install it for your machine and get a database up and running. After you have created a database and a database user, you can fill out the environment variables in the *server/.env* file.
 
 ```
 DATABASE=mydatabase
@@ -66,8 +66,3 @@ The `TOKEN_SECRET` is just a random string for your authentication. Keep all the
   * to match it from package.json: `createdb mytestdatabase` with psql
 * one terminal: npm run test-server
 * second terminal: npm run test
-
-## Want to learn more about React + GraphQL + Apollo?
-
-* Don't miss [upcoming Tutorials and Courses](https://www.getrevue.co/profile/rwieruch)
-* Check out current [React Courses](https://roadtoreact.com)

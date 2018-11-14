@@ -100,8 +100,8 @@ export default {
   },
 
   User: {
-    messages: async (user, args, { models }) =>
-      await models.Message.findAll({
+    events: async (user, args, { models }) =>
+      await models.Event.findAll({
         where: {
           userId: user.id,
         },

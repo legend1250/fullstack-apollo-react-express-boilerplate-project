@@ -20,18 +20,10 @@ let UserSchema = new Schema({
     enum: ['admin', 'operator', 'user'],
     default: 'user'
   },
-  messages: {
+  events: {
     type: Schema.Types.ObjectId,
-    ref: 'message'
-  },
-  // createdAt: {
-  //   type: Schema.Types.Date,
-  //   default: null
-  // },
-  // updatedAt: {
-  //   type: Schema.Types.Date,
-  //   default: null
-  // }
+    ref: 'event'
+  }
 }, {
   timestamps: true
 });

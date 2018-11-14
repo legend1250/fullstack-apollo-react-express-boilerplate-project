@@ -1,4 +1,4 @@
 import userResolvers from './user';
-import messageResolvers from './message';
+import eventResolvers from './event';
 
-export default [userResolvers, messageResolvers];
+export default [userResolvers, eventResolvers];
