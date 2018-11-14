@@ -9,10 +9,13 @@ import { HttpLink } from 'apollo-link-http';
 import { WebSocketLink } from 'apollo-link-ws';
 import { onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { withClientState } from 'apollo-link-state'
 
 import App from './components/App';
 import { signOut } from './components/SignOut';
 // import registerServiceWorker from './registerServiceWorker';
+import 'semantic-ui-css/semantic.min.css'
+import gql from 'graphql-tag';
 
 const port = process.env.REACT_APP_SERVER_PORT || 5000;
 const host = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_HOST_NAME : 'localhost'
@@ -72,9 +75,38 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const link = ApolloLink.from([authLink, errorLink, terminatingLink]);
-
 const cache = new InMemoryCache();
+
+const stateLink = withClientState({
+  cache,
+  defaults: {
+    loading: false
+  },
+  resolvers: {
+    Mutation: {
+      toggleLoading: ( _, variables, { cache, getCacheKey }) => {
+        const query = gql`
+          query {
+            loading @client
+          }
+        `
+        const { loading } = cache.readQuery({ query })
+        const data = {
+          loading: !loading
+        }
+        cache.writeData({ data })
+        return null
+      }
+    }
+  },
+  typeDefs: `
+    type Query {
+      loading: Bool
+    }
+  `,
+});
+
+const link = ApolloLink.from([stateLink, authLink, errorLink, terminatingLink]);
 
 export const client = new ApolloClient({
   link,

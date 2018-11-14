@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 import * as routes from '../../constants/routes';
 import SignOutButton from '../SignOut';
 import Loading from '../Loading'
+import { Query } from 'react-apollo';
+import gql from 'graphql-tag';
+import { client } from '../../'
+import { Button, Dimmer, Loader, Image, Segment } from 'semantic-ui-react'
+import './styles.scss'
 
 const Navigation = ({ session }) => (
   <div>
@@ -82,9 +87,62 @@ class APIStatus extends React.Component{
     return (
       <div>
         <span style={style}>Express API status: {status}</span>
+        <div className='loading' >
+          <LocalLoading />
+        </div>
       </div>
     )
   }
 }
 
 export default Navigation;
+
+const getLoading = gql`
+  query {
+    loading @client
+  }
+`
+const toggleLoad = gql`
+  mutation {
+    toggleLoading @client
+  }
+`
+class LocalLoading extends Component{
+
+  toggleLoading = () => {
+    client.mutate({mutation: toggleLoad})
+  }
+
+  render() {
+
+    return(
+      <div>
+        {/* <Mutation
+          mutation={toggleLoad}
+          variables={{loading: true}}
+        >
+          {(toggleLoading) => (
+            <Button onClick={() => handleToggleLoading(toggleLoading)} >Loading</Button>
+          )}
+        </Mutation> */}
+        
+        <Query
+          query={getLoading}
+        >
+        {({data}) => (
+          <>
+            <Button onClick={this.toggleLoading} >Loading</Button>
+            <Segment>
+              <Dimmer active={data.loading} inverted>
+                <Loader inverted>Loading</Loader>
+              </Dimmer>
+      
+              <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
+            </Segment>
+          </>
+        )}
+        </Query>
+      </div>
+    )
+  }
+}
