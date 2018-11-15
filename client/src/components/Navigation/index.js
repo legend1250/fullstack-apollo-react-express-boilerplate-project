@@ -7,7 +7,7 @@ import Loading from '../Loading'
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { client } from '../../'
-import { Button, Dimmer, Loader, Image, Segment } from 'semantic-ui-react'
+import { Button } from 'antd'
 import './styles.scss'
 
 const Navigation = ({ session }) => (
@@ -87,9 +87,10 @@ class APIStatus extends React.Component{
     return (
       <div>
         <span style={style}>Express API status: {status}</span>
-        <div className='loading' >
+        {/* <div className='loading' >
           <LocalLoading />
-        </div>
+        </div> */}
+        <Button>Antd Button</Button>
       </div>
     )
   }
@@ -107,42 +108,42 @@ const toggleLoad = gql`
     toggleLoading @client
   }
 `
-class LocalLoading extends Component{
+// class LocalLoading extends Component{
 
-  toggleLoading = () => {
-    client.mutate({mutation: toggleLoad})
-  }
+//   toggleLoading = () => {
+//     client.mutate({mutation: toggleLoad})
+//   }
 
-  render() {
+//   render() {
 
-    return(
-      <div>
-        {/* <Mutation
-          mutation={toggleLoad}
-          variables={{loading: true}}
-        >
-          {(toggleLoading) => (
-            <Button onClick={() => handleToggleLoading(toggleLoading)} >Loading</Button>
-          )}
-        </Mutation> */}
+//     return(
+//       <div>
+//         {/* <Mutation
+//           mutation={toggleLoad}
+//           variables={{loading: true}}
+//         >
+//           {(toggleLoading) => (
+//             <Button onClick={() => handleToggleLoading(toggleLoading)} >Loading</Button>
+//           )}
+//         </Mutation> */}
         
-        <Query
-          query={getLoading}
-        >
-        {({data}) => (
-          <>
-            <Button onClick={this.toggleLoading} >Loading</Button>
-            <Segment>
-              <Dimmer active={data.loading} inverted>
-                <Loader inverted>Loading</Loader>
-              </Dimmer>
+//         <Query
+//           query={getLoading}
+//         >
+//         {({data}) => (
+//           <>
+//             <Button onClick={this.toggleLoading} >Loading</Button>
+//             <Segment>
+//               <Dimmer active={data.loading} inverted>
+//                 <Loader inverted>Loading</Loader>
+//               </Dimmer>
       
-              <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
-            </Segment>
-          </>
-        )}
-        </Query>
-      </div>
-    )
-  }
-}
+//               <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
+//             </Segment>
+//           </>
+//         )}
+//         </Query>
+//       </div>
+//     )
+//   }
+// }
