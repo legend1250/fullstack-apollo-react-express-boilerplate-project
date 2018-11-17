@@ -9,5 +9,5 @@ const AdminPage = () => (
 );
 
 export default withAuthorization(
-  session => session && session.me && session.me.role === 'ADMIN',
+  session => session && session.me && session.me.role === 'admin',
 )(AdminPage);

@@ -7,6 +7,7 @@ import { withRouter, Redirect } from 'react-router-dom';
 import { SignUpLink } from '../SignUp';
 import * as routes from '../../constants/routes';
 import ErrorMessage from '../Error';
+import Navigation from '../Navigation';
 
 const SIGN_IN = gql`
   mutation($username: String!, $password: String!) {
@@ -23,6 +24,7 @@ const SignInPage = ({history, refetch, session}) => {
 
   return(
     <div>
+      {/* <Navigation /> */}
       <h1>SignIn</h1>
       <SignInForm history={history} refetch={refetch} />
       <SignUpLink />

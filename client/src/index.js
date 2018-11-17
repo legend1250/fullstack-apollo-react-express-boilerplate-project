@@ -81,6 +81,9 @@ const cache = new InMemoryCache();
 const stateLink = withClientState({
   cache,
   defaults: {
+    session: {
+      me: null
+    },
     loading: false
   },
   resolvers: {
@@ -97,12 +100,36 @@ const stateLink = withClientState({
         }
         cache.writeData({ data })
         return null
+      },
+      setSession: ( _, { session }, { cache, getCacheKey }) => {
+        console.log('session: ' ,session);
+        const data = {
+          session : {
+            me: {
+              ...session.me,
+              __typename: "User"
+            },
+            __typename: "Session"
+          }
+        }
+        cache.writeData({ data })
+        return null
       }
     }
   },
   typeDefs: `
-    type Query {
+    extend type Query {
       loading: Bool
+      getSession: Session!
+    }
+    Session {
+      me: User
+    }
+    User {
+      id: ID!
+      username: String!
+      email: String!
+      role: String
     }
   `,
 });

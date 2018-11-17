@@ -1,5 +1,6 @@
 import React from 'react';
-import { Router, Route, Switch } from 'react-router-dom';
+import { client } from '../../'
+import { Router, Route, Switch, Link } from 'react-router-dom';
 
 import Navigation from '../Navigation';
 import LandingPage from '../Landing';
@@ -12,46 +13,76 @@ import withSession from '../Session/withSession';
 import * as routes from '../../constants/routes';
 import history from '../../constants/history';
 import { Page404 } from '../Error';
+import SiderDemo from '../Layout';
+import gql from 'graphql-tag';
 
-const App = ({ session, refetch }) => (
-  <Router history={history}>
-    <div>
-      <Navigation session={session} />
+const setSession = gql`
+  mutation($session: Session) {
+    setSession(session: $session) @client
+  }
+`
 
-      <hr />
+const App = ({ session, refetch }) => {
+  client.mutate({ mutation: setSession, variables: { session }})
 
-      <Switch>
-        <Route
-          exact
-          path={routes.LANDING}
-          component={LandingPage}
-        />
-        <Route
-          exact
-          path={routes.SIGN_UP}
-          component={() => <SignUpPage refetch={refetch} />}
-        />
-        <Route
-          exact
-          path={routes.SIGN_IN}
-          component={() => <SignInPage refetch={refetch} session={session} />}
-        />
-        <Route
-          exact
-          path={routes.ACCOUNT}
-          component={AccountPage}
-        />
-        <Route
-          exact
-          path={routes.ADMIN}
-          component={AdminPage}
-        />
-        <Route
-          component={Page404}
-        />
-      </Switch>
-    </div>
-  </Router>
-);
+  return(
+    <Router history={history}>
+      <div>
+        {session && session.me ?
+          <div>
+            <AuthorizedContainer session={session} refetch={refetch} /> 
+          </div>
+          :
+          <div>
+            <NavigationNonAuth />
+            <UnauthorizedContainer session={session} refetch={refetch} />
+          </div>
+        }
+      </div>
+    </Router>
+  )
+}
 
 export default withSession(App);
+
+const AuthorizedContainer = ({session, refetch}) => (
+  <Switch>
+    <Route 
+      component={SiderDemo}
+    />
+  </Switch>
+)
+
+const NavigationNonAuth = () => (
+  <ul>
+    <li>
+      <Link to={routes.SIGN_IN}>Sign In</Link>
+    </li>
+    <li>
+      <Link to={routes.SIGN_UP}>Sign Up</Link>
+    </li>
+  </ul>
+);
+
+const UnauthorizedContainer = ({session, refetch}) => (
+  <Switch>
+    <Route
+      exact
+      path={routes.SIGN_UP}
+      component={() => <SignUpPage refetch={refetch} />}
+    />
+    <Route
+      exact
+      path={routes.SIGN_IN}
+      component={() => <SignInPage refetch={refetch} session={session} />}
+    />
+    <Route
+      exact
+      path='/'
+      component={() => <SignInPage refetch={refetch} session={session} />}
+    />
+    <Route
+      component={Page404}
+    />
+  </Switch>
+)
