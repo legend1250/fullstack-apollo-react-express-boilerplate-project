@@ -17,20 +17,13 @@ const SIGN_IN = gql`
   }
 `;
 
-const SignInPage = ({history, refetch, session}) => {
-  if(session && session.me){
-    return <Redirect to={routes.LANDING} />
-  }
-
-  return(
-    <div>
-      {/* <Navigation /> */}
-      <h1>SignIn</h1>
-      <SignInForm history={history} refetch={refetch} />
-      <SignUpLink />
-    </div>
-  );
-}
+const SignInPage = ({history, refetch}) => (
+  <div>
+    <h1>SignIn</h1>
+    <SignInForm history={history} refetch={refetch} />
+    <SignUpLink />
+  </div>
+)
 
 const INITIAL_STATE = {
   username: '',

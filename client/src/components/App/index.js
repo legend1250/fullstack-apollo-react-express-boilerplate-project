@@ -35,7 +35,7 @@ const App = ({ session, refetch }) => {
           :
           <div>
             <NavigationNonAuth />
-            <UnauthorizedContainer session={session} refetch={refetch} />
+            <UnauthorizedContainer history={history} session={session} refetch={refetch} />
           </div>
         }
       </div>
@@ -64,7 +64,7 @@ const NavigationNonAuth = () => (
   </ul>
 );
 
-const UnauthorizedContainer = ({session, refetch}) => (
+const UnauthorizedContainer = ({history, session, refetch}) => (
   <Switch>
     <Route
       exact
@@ -79,7 +79,7 @@ const UnauthorizedContainer = ({session, refetch}) => (
     <Route
       exact
       path='/'
-      component={() => <SignInPage refetch={refetch} session={session} />}
+      component={() => <SignInPage refetch={refetch} history={history} />}
     />
     <Route
       component={Page404}

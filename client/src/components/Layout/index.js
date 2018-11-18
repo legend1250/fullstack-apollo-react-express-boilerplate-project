@@ -1,13 +1,15 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { client } from '../../'
-import { Router, Route, Switch, Link } from 'react-router-dom';
+import { Route, Switch, Link } from 'react-router-dom';
 import { Layout, Menu, Breadcrumb, Icon, Button } from 'antd';
+import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { routesComp, routesMenu } from './routes'
 import { Page404 } from '../Error';
-import { Query } from 'react-apollo';
+import Header from './Header'
+import './styles.scss'
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 
 const getSession = gql`
@@ -27,8 +29,13 @@ class SiderDemo extends React.Component {
   };
 
   onCollapse = (collapsed) => {
-    console.log(collapsed);
     this.setState({ collapsed });
+  }
+
+  handleGotoHome = () => {
+    if(this.props.history.pathname !== '/'){
+      this.props.history.push('/')
+    }
   }
 
   getSession = () => {
@@ -51,7 +58,7 @@ class SiderDemo extends React.Component {
                 collapsed={this.state.collapsed}
                 onCollapse={this.onCollapse}
               >
-                <div className="logo" />
+                <div className="layout-logo__wrapper" onClick={this.handleGotoHome} />
                 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
                   {routesMenu.filter(route => route.roles.includes(me.role)).map(item => {
                     if(item.subComponent){
@@ -85,7 +92,7 @@ class SiderDemo extends React.Component {
                 </Menu>
               </Sider>
               <Layout>
-                <Header style={{ background: '#fff', padding: 0 }} />
+                <Header user={me} />
                 <Content style={{ margin: '0 16px' }}>
                   <Breadcrumb style={{ margin: '16px 0' }}>
                     <Breadcrumb.Item>User</Breadcrumb.Item>

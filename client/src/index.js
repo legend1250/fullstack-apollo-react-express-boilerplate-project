@@ -102,7 +102,7 @@ const stateLink = withClientState({
         return null
       },
       setSession: ( _, { session }, { cache, getCacheKey }) => {
-        console.log('session: ' ,session);
+        // console.log('session: ' ,session);
         const data = {
           session : {
             me: {
