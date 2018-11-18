@@ -7,7 +7,7 @@ import Loading from '../Loading'
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { client } from '../../'
-import { Button, Dimmer, Loader, Image, Segment } from 'semantic-ui-react'
+import { Button, Skeleton } from 'antd'
 import './styles.scss'
 
 const Navigation = ({ session }) => (
@@ -48,7 +48,7 @@ const NavigationNonAuth = () => (
       <Link to={routes.SIGN_IN}>Sign In</Link>
     </li>
     <li>
-      <Link to={routes.LANDING}>Landing</Link>
+      <Link to={routes.SIGN_UP}>Sign Up</Link>
     </li>
   </ul>
 );
@@ -130,16 +130,10 @@ class LocalLoading extends Component{
           query={getLoading}
         >
         {({data}) => (
-          <>
-            <Button onClick={this.toggleLoading} >Loading</Button>
-            <Segment>
-              <Dimmer active={data.loading} inverted>
-                <Loader inverted>Loading</Loader>
-              </Dimmer>
-      
-              <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
-            </Segment>
-          </>
+          <div>
+            <Button type='primary' onClick={this.toggleLoading} >Toggle loading</Button>
+            <Skeleton active={data.loading} />
+          </div>
         )}
         </Query>
       </div>

@@ -14,8 +14,9 @@ import { withClientState } from 'apollo-link-state'
 import App from './components/App';
 import { signOut } from './components/SignOut';
 // import registerServiceWorker from './registerServiceWorker';
-import 'semantic-ui-css/semantic.min.css'
 import gql from 'graphql-tag';
+// import 'antd/dist/antd.css';
+import './atnd.less'
 
 const port = process.env.REACT_APP_SERVER_PORT || 5000;
 const host = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_HOST_NAME : 'localhost'
@@ -80,6 +81,9 @@ const cache = new InMemoryCache();
 const stateLink = withClientState({
   cache,
   defaults: {
+    session: {
+      me: null
+    },
     loading: false
   },
   resolvers: {
@@ -96,12 +100,36 @@ const stateLink = withClientState({
         }
         cache.writeData({ data })
         return null
+      },
+      setSession: ( _, { session }, { cache, getCacheKey }) => {
+        // console.log('session: ' ,session);
+        const data = {
+          session : {
+            me: {
+              ...session.me,
+              __typename: "User"
+            },
+            __typename: "Session"
+          }
+        }
+        cache.writeData({ data })
+        return null
       }
     }
   },
   typeDefs: `
-    type Query {
+    extend type Query {
       loading: Bool
+      getSession: Session!
+    }
+    Session {
+      me: User
+    }
+    User {
+      id: ID!
+      username: String!
+      email: String!
+      role: String
     }
   `,
 });
