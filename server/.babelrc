@@ -1,11 +1,15 @@
 {
- "presets": [
-    [
-      "env", {
-        "targets": {
-          "node": "current"
-        }
-      }
-    ], "stage-2"
-  ]
-}
+  "presets": [
+     [
+       "@babel/preset-env",
+       {
+         "targets": {
+           "node": true
+         }
+       }
+     ]
+   ],
+   "sourceMaps": true,
+   "retainLines": true,
+   "plugins": ["@babel/plugin-proposal-optional-chaining"]
+ }

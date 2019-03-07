@@ -1,69 +1,57 @@
-import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs'
 
-const user = (sequelize, DataTypes) => {
-  const User = sequelize.define('user', {
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-        isEmail: true,
-      },
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-        len: [7, 42],
-      },
-    },
-    role: {
-      type: DataTypes.STRING,
-    },
-  });
+const Schema = mongoose.Schema;
 
-  User.associate = models => {
-    User.hasMany(models.Message, { onDelete: 'CASCADE' });
-  };
+let UserSchema = new Schema({
+  username: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'operator', 'user'],
+    default: 'user'
+  },
+  messages: {
+    type: Schema.Types.ObjectId,
+    ref: 'message'
+  }
+});
 
-  User.findByLogin = async login => {
-    let user = await User.findOne({
-      where: { username: login },
-    });
+// pre-hook
 
-    if (!user) {
-      user = await User.findOne({
-        where: { email: login },
-      });
-    }
+UserSchema.pre('save', async function(next){
+  this.password = await this.generatePasswordHash()
+  return next()
+})
 
-    return user;
-  };
+// method
+UserSchema.methods.generatePasswordHash = async function(){
+  const saltRounds = 10;
+  return await bcrypt.hash(this.password, saltRounds);
+}
 
-  User.beforeCreate(async user => {
-    user.password = await user.generatePasswordHash();
-  });
+UserSchema.methods.validatePassword = async function(password) {
+  return await bcrypt.compare(password, this.password);
+}
 
-  User.prototype.generatePasswordHash = async function() {
-    const saltRounds = 10;
-    return await bcrypt.hash(this.password, saltRounds);
-  };
+// statics
 
-  User.prototype.validatePassword = async function(password) {
-    return await bcrypt.compare(password, this.password);
-  };
+UserSchema.statics.findByLogin = async function(username){
+  let user = await this.findOne({username})
+  if (!user) {
+    user = await this.findOne({email: username})
+  }
 
-  return User;
+  return user;
 };
 
-export default user;
+export default mongoose.model('user', UserSchema);

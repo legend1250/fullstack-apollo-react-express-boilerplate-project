@@ -1,16 +1,23 @@
-const message = (sequelize, DataTypes) => {
-  const Message = sequelize.define('message', {
-    text: {
-      type: DataTypes.STRING,
-      validate: { notEmpty: true },
-    },
-  });
+import mongoose from 'mongoose';
+const Schema = mongoose.Schema;
 
-  Message.associate = models => {
-    Message.belongsTo(models.User);
-  };
+let MessageSchema = new Schema({
+  text:{
+    type: String
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'user'
+  },
+  createdAt: {
+    type: Schema.Types.Date,
+    default: Date.now()
+  }
+})
 
-  return Message;
-};
+MessageSchema.pre('find', async (next) => {
+  // console.log('message findAll');
+  next()
+})
 
-export default message;
+export default mongoose.model('message', MessageSchema);

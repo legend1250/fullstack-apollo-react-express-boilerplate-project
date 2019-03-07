@@ -9,28 +9,28 @@ import { AuthenticationError } from 'apollo-server';
 
 import schema from './schema';
 import resolvers from './resolvers';
-import models, { sequelize } from './models';
+import models, { sequelize, connect } from './models';
 import loaders from './loaders';
 
-const port = process.env.PORT || 5000;
+const SERVER_PORT = process.env.SERVER_PORT || 8000;
+const SERVER_HOST = process.env.NODE_ENV === 'production' ? process.env.HOST_NAME : 'localhost'
 
 const app = express();
 
-const corsOptions = {
-  origin: `http://localhost:${port}`,
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
-app.use(cors(corsOptions));
-app.use(express.static(__dirname + '/public'));
-app.set('view engine', 'html');
+// const corsOptions = {
+//   origin: `http://localhost:${port}`,
+//   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+// }
+// app.use(cors(corsOptions));
+// app.use(express.static(__dirname + '/public'));
+// app.set('view engine', 'html');
 
 const getMe = async req => {
   const token = req.headers['x-token'];
 
   if (token) {
     try {
-      let result = await jwt.verify(token, process.env.TOKEN_SECRET);
-      return result
+      return await jwt.verify(token, process.env.TOKEN_SECRET);
     } catch (e) {
       throw new AuthenticationError(
         'Your session expired. Sign in again.',
@@ -86,12 +86,13 @@ server.applyMiddleware({ app, path: '/graphql' });
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
-httpServer.listen({ port }, () => {
-  console.log(`Apollo Server on http://localhost:${port}/graphql`);
-});
-
-app.get('/', (req, res) => {
-  res.render('index')
+connect(function(err) {
+  if (!err) {
+    httpServer.listen({ port: SERVER_PORT }, () => {
+      console.log(`Apollo Server starts on ${SERVER_HOST}:${SERVER_PORT}/graphql`)
+      app.emit('serverStarted')
+    })
+  }
 })
 
 app.get('/api/status', (req, res) => {
@@ -99,60 +100,13 @@ app.get('/api/status', (req, res) => {
 });
 
 app.get('/auth', async (req, res) => {
-  const me = await getMe(req)
-  if(!me){
-    return res.send({status: 403, message: 'Permission denied'})
+  try {
+    const me = await getMe(req)
+    if(!me){
+      return res.send({status: 403, message: 'Permission denied'})
+    }
+  } catch (error) {
+    return res.send({status: 400, message: 'Bad request', error})
   }
   res.send({ status: 'ok', me})
 })
-
-const isTest = !!process.env.TEST_DATABASE;
-const isProduction = !!process.env.DATABASE_URL;
-
-// sequelize.sync({ force: isTest || isProduction }).then(async () => {
-//   if (isTest || isProduction) {
-//     createUsersWithMessages(new Date());
-//   }
-
-// });
-
-// const createUsersWithMessages = async date => {
-//   await models.User.create(
-//     {
-//       username: 'rwieruch',
-//       email: 'hello@robin.com',
-//       password: 'rwieruch',
-//       role: 'ADMIN',
-//       messages: [
-//         {
-//           text: 'Published the Road to learn React',
-//           createdAt: date.setSeconds(date.getSeconds() + 1),
-//         },
-//       ],
-//     },
-//     {
-//       include: [models.Message],
-//     },
-//   );
-
-//   await models.User.create(
-//     {
-//       username: 'ddavids',
-//       email: 'hello@david.com',
-//       password: 'ddavids',
-//       messages: [
-//         {
-//           text: 'Happy to release a GraphQL in React tutorial',
-//           createdAt: date.setSeconds(date.getSeconds() + 1),
-//         },
-//         {
-//           text: 'A complete React with Apollo and GraphQL Tutorial',
-//           createdAt: date.setSeconds(date.getSeconds() + 1),
-//         },
-//       ],
-//     },
-//     {
-//       include: [models.Message],
-//     },
-//   );
-// };

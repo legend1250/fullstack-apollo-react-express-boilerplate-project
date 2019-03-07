@@ -1,4 +1,3 @@
-import Sequelize from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
 
 import { isAuthenticated, isMessageOwner } from './authorization';
@@ -15,19 +14,20 @@ export default {
     messages: async (parent, { cursor, limit = 100 }, { models }) => {
       const cursorOptions = cursor
         ? {
-            where: {
-              createdAt: {
-                [Sequelize.Op.lt]: fromCursorHash(cursor),
-              },
+            createdAt: {
+              '$lt': fromCursorHash(cursor),
             },
           }
         : {};
 
-      const messages = await models.Message.findAll({
-        order: [['createdAt', 'DESC']],
-        limit: limit + 1,
+      const messages = await models.Message.find({
         ...cursorOptions,
-      });
+      }, null, {
+        limit: limit + 1,
+        sort: {
+          createdAt: -1
+        }
+      })
 
       const hasNextPage = messages.length > limit;
       const edges = hasNextPage ? messages.slice(0, -1) : messages;
@@ -36,9 +36,9 @@ export default {
         edges,
         pageInfo: {
           hasNextPage,
-          endCursor: toCursorHash(
-            edges[edges.length - 1].createdAt.toString(),
-          ),
+          endCursor: edges[edges.length - 1] ? toCursorHash(
+            edges[edges.length - 1].createdAt.toString()
+          ) : '',
         },
       };
     },
@@ -67,14 +67,23 @@ export default {
     deleteMessage: combineResolvers(
       isAuthenticated,
       isMessageOwner,
-      async (parent, { id }, { models }) =>
-        await models.Message.destroy({ where: { id } }),
+      async (parent, { id }, { models }) =>{
+        try {
+          const { errors } = await models.Message.findByIdAndDelete(id)
+          if(errors){
+            return false
+          }
+        } catch (error) {
+          return false
+        }
+        return true
+      },
     ),
   },
 
   Message: {
     user: async (message, args, { loaders }) =>
-      await loaders.user.load(message.userId),
+      await loaders.user.load(message.userId)
   },
 
   Subscription: {
@@ -82,4 +91,4 @@ export default {
       subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
     },
   },
-};
+}

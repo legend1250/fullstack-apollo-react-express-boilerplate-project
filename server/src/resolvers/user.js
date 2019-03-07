@@ -1,29 +1,30 @@
 import jwt from 'jsonwebtoken';
+import uuidV4 from 'uuid/v4'
 import { combineResolvers } from 'graphql-resolvers';
 import { AuthenticationError, UserInputError } from 'apollo-server';
-
-import { isAuthenticated, isAdmin } from './authorization';
 
 const tokenExpired = 60 * 60 * 8 // 8 hours
 
 const createToken = async (user, secret) => {
-  const { id, email, username, role } = user;
-  return await jwt.sign({ id, email, username, role }, secret, {
+  const jti = uuidV4()
+  const payLoad = {
+    iss: process.env.TOKEN_ISSUER || 'ISSUER',
+    id,
+    email,
+    username,
+    role,
+    jti
+  }
+  return await jwt.sign(payLoad, secret, {
     expiresIn: tokenExpired,
   });
 };
 
 export default {
   Query: {
-    users: combineResolvers(
-      isAdmin,
-      async (parent, args, { models }) =>
-      await models.User.findAll()
-    ),
-
-    user: async (parent, { id }, { models }) =>
-      await models.User.findById(id),
-
+    users: async (parent, args, { models }) => {
+      return await models.User.find();
+    },
     me: async (parent, args, { models, me }) => {
       if (!me) {
         return null;
@@ -32,28 +33,21 @@ export default {
       return await models.User.findById(me.id);
     },
   },
-
   Mutation: {
     signUp: async (
       parent,
       { username, email, password },
       { models, secret },
     ) => {
-      const user = await models.User.create({
-        username,
-        email,
-        password,
-      });
-
+      const user = await models.User.create({username, email, password})
       return { token: createToken(user, secret) };
     },
-
     signIn: async (
       parent,
-      { login, password },
+      { username, password },
       { models, secret },
     ) => {
-      const user = await models.User.findByLogin(login);
+      const user = await models.User.findByLogin(username);
 
       if (!user) {
         throw new UserInputError(
@@ -62,37 +56,11 @@ export default {
       }
 
       const isValid = await user.validatePassword(password);
-
       if (!isValid) {
         throw new AuthenticationError('Invalid password.');
       }
 
       return { token: createToken(user, secret) };
     },
-
-    updateUser: combineResolvers(
-      isAuthenticated,
-      async (parent, { username }, { models, me }) => {
-        const user = await models.User.findById(me.id);
-        return await user.update({ username });
-      },
-    ),
-
-    deleteUser: combineResolvers(
-      isAdmin,
-      async (parent, { id }, { models }) =>
-        await models.User.destroy({
-          where: { id },
-        }),
-    ),
-  },
-
-  User: {
-    messages: async (user, args, { models }) =>
-      await models.Message.findAll({
-        where: {
-          userId: user.id,
-        },
-      }),
-  },
-};
+  }
+}
