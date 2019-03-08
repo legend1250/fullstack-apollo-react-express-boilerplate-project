@@ -40,6 +40,12 @@ export default {
       { username, email, password },
       { models, secret },
     ) => {
+      const existed = await models.User.findOne({ $or: [{ username }, { email }] })
+      if(existed){
+        throw new UserInputError(
+          'Username or Email has been taken',
+        );
+      }
       const user = await models.User.create({username, email, password})
       return { token: createToken(user, secret) };
     },

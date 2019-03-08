@@ -48,7 +48,6 @@ const Messages = ({ limit, me }) => (
     variables={{ limit }}
   >
     {({ data, loading, error, fetchMore, subscribeToMore }) => {
-      console.log('data: ',data);
       if(loading){
         return <Loading />
       }
