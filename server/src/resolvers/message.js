@@ -11,11 +11,11 @@ const fromCursorHash = string =>
 
 export default {
   Query: {
-    messages: async (parent, { cursor, limit = 100 }, { models }) => {
+    messages: async (parent, { cursor = '', limit = 100 }, { models }) => {
       const cursorOptions = cursor
         ? {
             createdAt: {
-              '$lt': fromCursorHash(cursor),
+              $lte: fromCursorHash(cursor),
             },
           }
         : {};
@@ -36,7 +36,7 @@ export default {
         edges,
         pageInfo: {
           hasNextPage,
-          endCursor: edges[edges.length - 1] ? toCursorHash(
+          endCursor: edges.length > 0 ? toCursorHash(
             edges[edges.length - 1].createdAt.toString()
           ) : '',
         },

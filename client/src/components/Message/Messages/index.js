@@ -48,6 +48,10 @@ const Messages = ({ limit, me }) => (
     variables={{ limit }}
   >
     {({ data, loading, error, fetchMore, subscribeToMore }) => {
+      console.log('data: ',data);
+      if(loading){
+        return <Loading />
+      }
       if (!data) {
         return (
           <div>
@@ -58,15 +62,16 @@ const Messages = ({ limit, me }) => (
       }
 
       const { messages } = data;
-
-      if (loading || !messages) {
-        return <Loading />;
-      }
-
       const { edges, pageInfo } = messages;
 
       return (
         <Fragment>
+          {edges.length === 0 &&
+            <div>
+              There are no messages yet ... Try to create one by
+              yourself.
+            </div>
+          }
           <MessageList
             messages={edges}
             me={me}
@@ -165,7 +170,7 @@ class MessageList extends Component {
 const MessageItem = ({ message, me }) => (
   <div>
     <h3>{message.user.username}</h3>
-    <small>{message.createdAt}</small>
+    <small>{new Date(Number(message.createdAt)).toLocaleString()}</small>
     <p>{message.text}</p>
 
     {me &&

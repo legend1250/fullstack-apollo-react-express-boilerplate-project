@@ -7,6 +7,7 @@ const tokenExpired = 60 * 60 * 8 // 8 hours
 
 const createToken = async (user, secret) => {
   const jti = uuidV4()
+  const { id, email, username, role } = user
   const payLoad = {
     iss: process.env.TOKEN_ISSUER || 'ISSUER',
     id,

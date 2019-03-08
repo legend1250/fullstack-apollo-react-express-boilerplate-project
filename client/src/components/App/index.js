@@ -22,7 +22,7 @@ const App = ({ session, refetch }) => (
       <Route
         exact
         path={routes.LANDING}
-        component={LandingPage}
+        component={() => <LandingPage />}
       />
       <Route
         exact
@@ -37,12 +37,12 @@ const App = ({ session, refetch }) => (
       <Route
         exact
         path={routes.ACCOUNT}
-        component={AccountPage}
+        component={() => <AccountPage />}
       />
       <Route
         exact
         path={routes.ADMIN}
-        component={AdminPage}
+        component={() => <AdminPage />}
       />
     </div>
   </Router>

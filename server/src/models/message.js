@@ -8,11 +8,9 @@ let MessageSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'user'
-  },
-  createdAt: {
-    type: Schema.Types.Date,
-    default: Date.now()
   }
+}, {
+  timestamps: true
 })
 
 MessageSchema.pre('find', async (next) => {
