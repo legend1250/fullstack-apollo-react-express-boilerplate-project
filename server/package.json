@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
+    "debug": "nodemon --nolazy --require @babel/register --inspect src/index.js",
     "build": "babel src --out-dir dist",
     "serve": "npm run build && node dist/index.js",
     "test": "mocha --require babel-core/register 'src/**/*.spec.js'"
