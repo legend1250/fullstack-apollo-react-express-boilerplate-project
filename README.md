@@ -51,10 +51,7 @@ A full-fledged Apollo Server 2 with Apollo Client 2 starter project with React, 
 Since this boilerplate project is using PostgreSQL, you have to install it for your machine and get a database up and running. You find everything for the set up over here: [Setup PostgreSQL with Sequelize in Express Tutorial](https://www.robinwieruch.de/postgres-express-setup-tutorial). After you have created a database and a database user, you can fill out the environment variables in the *server/.env* file.
 
 ```
-DATABASE=mydatabase
-DATABASE_USER=postgres
-DATABASE_PASSWORD=postgres
-
+MONGODB_URI=mongodb://localhost:27017/boilerplate
 TOKEN_SECRET=asdlplplfwfwefwekwself.2342.dawasdq
 ```
 
